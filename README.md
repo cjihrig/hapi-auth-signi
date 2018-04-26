@@ -68,7 +68,7 @@ const signature = signer.sign(privateKey, 'base64');
 
 ## API
 
-`hapi-auth-signi` is a hapi plugin that exposes an authentication scheme named `'signature'`. The plugin supports the following configuration options:
+`hapi-auth-signi` is a hapi plugin that exposes an authentication scheme named `'signature'`. An authentication strategy of the same name is also created. The plugin supports the following configuration options:
 
 ### `tenants`
 
@@ -80,3 +80,11 @@ An object or array of objects defining the supported clients. Each tenant adhere
 - `algorithm` (string) - The algorithm name passed to `Crypto.createVerify()`.
 - `format` (string) - The format of the signature passed to `Verify.verify()`.
 - `authData` (object) - The result returned on successful authentication.
+
+### Custom Strategies
+
+The default strategy, `'signature'` uses the default settings described below. It is possible to create additional strategies by calling `server.auth.strategy('your_strategy_name_here', 'signature', options)` with customized options.
+
+#### `authorizationType`
+
+A string representing the authorization type. This is expected to be the first part of the `Authorization` HTTP header. Defaults to `'signature'`.

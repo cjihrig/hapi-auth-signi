@@ -35,6 +35,25 @@ describe('Hapi Auth Signature', () => {
     });
   });
 
+  it('allows the authorization type to be configured', async () => {
+    const server = await getServer();
+    const res = await server.inject({
+      method: 'GET',
+      url: '/bar',
+      headers: { Authorization: `Bearer ${getSignature()}` }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(JSON.parse(res.payload)).to.equal({
+      isAuthenticated: true,
+      isAuthorized: false,
+      credentials: { username: 'peterpluck' },
+      strategy: 'bearer',
+      mode: 'required',
+      error: null
+    });
+  });
+
   it('authenticates properly with key as string', async () => {
     const server = await getServer({
       tenants: {
@@ -160,12 +179,23 @@ async function getServer (options) {
     options: settings
   });
 
+  server.auth.strategy('bearer', 'signature', { authorizationType: 'bearer' });
   server.route([
     {
       method: 'GET',
       path: '/foo',
       config: {
         auth: 'signature',
+        handler (request, h) {
+          return request.auth;
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/bar',
+      config: {
+        auth: 'bearer',
         handler (request, h) {
           return request.auth;
         }
