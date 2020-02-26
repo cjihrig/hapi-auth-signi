@@ -1,17 +1,12 @@
 'use strict';
+const Assert = require('assert');
 const Crypto = require('crypto');
 const Fs = require('fs');
 const Path = require('path');
-const Code = require('code');
-const Hapi = require('hapi');
-const Lab = require('lab');
+const Hapi = require('@hapi/hapi');
+const Lab = require('@hapi/lab');
 const Auth = require('../lib');
-
-// Test shortcuts
-const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
-const { expect } = Code;
-
+const { describe, it } = exports.lab = Lab.script();
 const fixturesDir = Path.join(__dirname, 'fixtures');
 
 
@@ -24,10 +19,11 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `Signature ${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(200);
-    expect(JSON.parse(res.payload)).to.equal({
+    Assert.strictEqual(res.statusCode, 200);
+    Assert.deepStrictEqual(JSON.parse(res.payload), {
       isAuthenticated: true,
       isAuthorized: false,
+      isInjected: false,
       credentials: { username: 'peterpluck' },
       strategy: 'signature',
       mode: 'required',
@@ -43,10 +39,11 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `Bearer ${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(200);
-    expect(JSON.parse(res.payload)).to.equal({
+    Assert.strictEqual(res.statusCode, 200);
+    Assert.deepStrictEqual(JSON.parse(res.payload), {
       isAuthenticated: true,
       isAuthorized: false,
+      isInjected: false,
       credentials: { username: 'peterpluck' },
       strategy: 'bearer',
       mode: 'required',
@@ -70,10 +67,11 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `Signature ${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(200);
-    expect(JSON.parse(res.payload)).to.equal({
+    Assert.strictEqual(res.statusCode, 200);
+    Assert.deepStrictEqual(JSON.parse(res.payload), {
       isAuthenticated: true,
       isAuthorized: false,
+      isInjected: false,
       credentials: { username: 'peterpluck' },
       strategy: 'signature',
       mode: 'required',
@@ -97,10 +95,11 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `Signature ${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(200);
-    expect(JSON.parse(res.payload)).to.equal({
+    Assert.strictEqual(res.statusCode, 200);
+    Assert.deepStrictEqual(JSON.parse(res.payload), {
       isAuthenticated: true,
       isAuthorized: false,
+      isInjected: false,
       credentials: { username: 'peterpluck' },
       strategy: 'signature',
       mode: 'required',
@@ -115,7 +114,7 @@ describe('Hapi Auth Signature', () => {
       url: '/foo'
     });
 
-    expect(res.statusCode).to.equal(401);
+    Assert.strictEqual(res.statusCode, 401);
   });
 
   it('does not authenticate with malformed authorization header', async () => {
@@ -126,7 +125,7 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(401);
+    Assert.strictEqual(res.statusCode, 401);
   });
 
   it('does not authenticate with bad signature', async () => {
@@ -137,14 +136,14 @@ describe('Hapi Auth Signature', () => {
       headers: { Authorization: `Signature x${getSignature()}` }
     });
 
-    expect(res.statusCode).to.equal(401);
+    Assert.strictEqual(res.statusCode, 401);
   });
 
   it('throws on bad input', () => {
     async function fail (options) { // eslint-disable-line require-await
-      expect(async () => {
+      Assert.throws(async () => {
         await getServer(options);
-      }).to.throw();
+      });
     }
 
     fail({ tenants: 'foo' });

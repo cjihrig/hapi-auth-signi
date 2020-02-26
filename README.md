@@ -11,7 +11,7 @@ hapi authentication scheme for validating signed requests. Note that this plugin
 
 ```javascript
 'use strict';
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const HapiAuthSignature = require('hapi-auth-signi');
 const server = Hapi.server();
 
